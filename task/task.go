@@ -26,10 +26,12 @@ const FILE_NAME = "task_list_.json"
 func Add(t Task) {
 	tasks := List()
 
+	tasksLen := len(tasks)
+
 	if len(tasks) > 0 {
-		tasks = append(tasks, t)
+		tasks[tasksLen+1] = t
 	} else {
-		tasks = append(tasks, t)
+		tasks[tasksLen+1] = t
 	}
 
 	jsonData, _ := json.MarshalIndent(tasks, "", " ")
@@ -42,14 +44,15 @@ func Add(t Task) {
 	fmt.Println("JSON file written Successfully!")
 }
 
-func List() []Task {
-	tasks := []Task{}
+func List() map[int]Task {
+	tasks := map[int]Task{}
+	// tasks := []Task{}
+
 	data, err := os.ReadFile(FILE_NAME)
 
 	if err == nil && len(data) > 0 {
 		_ = json.Unmarshal(data, &tasks)
 	}
-
 	return tasks
 }
 
@@ -74,25 +77,22 @@ func Update(id ID, t Task) (ID, error) {
 
 func Delete(id ID) (string, error) {
 	tasks := List()
+	var itemKey int = -1
 
-	var itemIndexToRemove int
-	var isItemFound bool = false
-
-	for i, v := range tasks {
-		fmt.Println(v)
+	for key, v := range tasks {
+		fmt.Println(v, key)
 		if v.ID == id {
-			itemIndexToRemove = i
-			isItemFound = true
+			itemKey = key
 			break
 		}
 	}
 
-	if !isItemFound {
+	if itemKey == -1 {
 		formattedMsg := fmt.Sprintf("Task item not found ID : %s", id)
 		return "", errors.New(formattedMsg)
 	}
 
-	tasks = append(tasks[:itemIndexToRemove], tasks[itemIndexToRemove+1:]...)
+	delete(tasks, itemKey)
 
 	jsonData, _ := json.MarshalIndent(tasks, "", " ")
 	err := os.WriteFile(FILE_NAME, jsonData, 0664)
