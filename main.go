@@ -31,6 +31,6 @@ func main() {
 	task.Add(task1)
 	listOfTask := task.List()
 	fmt.Println(listOfTask)
-	task.Update("UETH754P46QZYMM7I5OH3JSH7U", task2Update)
-	task.Delete("UETH754P46QZYMM7I5OH3JSH7U")
+	task.Update("6H4DHPJYUK2HWTGOQSRIWLIRNL", task2Update)
+	task.Delete("CGPE2PZ2JODYZ7547AWVYCELFL")
 }

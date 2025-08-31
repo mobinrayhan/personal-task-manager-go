@@ -1,10 +1,8 @@
 package task
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"mobin.dev/io"
@@ -25,19 +23,13 @@ const FILE_NAME = "task_list_.json"
 
 func Add(t Task) {
 	tasks := List()
-	tasksLen := len(tasks)
-	tasks[tasksLen+1] = t
+	tasks = append(tasks, t)
 	io.WriteToFile(FILE_NAME, tasks)
 }
 
-func List() map[int]Task {
-	tasks := map[int]Task{}
-	err := io.ReadFromFile(FILE_NAME, &tasks)
-
-	if err != nil {
-		fmt.Println("Error loading tasks:", err)
-	}
-
+func List() []Task {
+	tasks := []Task{}
+	io.ReadFromFile(FILE_NAME, &tasks)
 	return tasks
 }
 
@@ -50,34 +42,29 @@ func Update(id ID, t Task) (ID, error) {
 			break
 		}
 	}
-	jsonDate, _ := json.MarshalIndent(tasks, "", " ")
-	err := os.WriteFile(FILE_NAME, jsonDate, 0644)
-
-	if err != nil {
-		return id, errors.New("failed to write at json file")
-	}
-
+	io.WriteToFile(FILE_NAME, tasks)
 	return id, nil
 }
 
 func Delete(id ID) (string, error) {
 	tasks := List()
-	var itemKey int = -1
 
-	for key, v := range tasks {
+	var itemIndexToRemove int = -1
+	for i, v := range tasks {
+		fmt.Println(v)
 		if v.ID == id {
-			itemKey = key
+			itemIndexToRemove = i
 			break
 		}
 	}
 
-	if itemKey == -1 {
+	if itemIndexToRemove == -1 {
 		formattedMsg := fmt.Sprintf("Task item not found ID : %s", id)
 		return "", errors.New(formattedMsg)
 	}
 
-	delete(tasks, itemKey)
-	io.WriteToFile(FILE_NAME, &tasks)
+	tasks = append(tasks[:itemIndexToRemove], tasks[itemIndexToRemove+1:]...)
+	io.WriteToFile(FILE_NAME, tasks)
 
 	deleteMessage := fmt.Sprintf("Delete Task Successfully %s:", id)
 	return deleteMessage, nil
