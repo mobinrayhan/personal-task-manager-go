@@ -65,7 +65,6 @@ func Delete(id ID) (string, error) {
 	var itemKey int = -1
 
 	for key, v := range tasks {
-		fmt.Println(v, key)
 		if v.ID == id {
 			itemKey = key
 			break
