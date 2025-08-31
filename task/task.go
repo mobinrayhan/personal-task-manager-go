@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"mobin.dev/io"
 )
 
 type ID = string
@@ -19,40 +21,23 @@ type Task struct {
 	DueDate     time.Time `json:"due_data"`
 }
 
-// var taskList := map[]
-
 const FILE_NAME = "task_list_.json"
 
 func Add(t Task) {
 	tasks := List()
-
 	tasksLen := len(tasks)
-
-	if len(tasks) > 0 {
-		tasks[tasksLen+1] = t
-	} else {
-		tasks[tasksLen+1] = t
-	}
-
-	jsonData, _ := json.MarshalIndent(tasks, "", " ")
-	err := os.WriteFile(FILE_NAME, jsonData, 0644)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("JSON file written Successfully!")
+	tasks[tasksLen+1] = t
+	io.WriteToFile(FILE_NAME, tasks)
 }
 
 func List() map[int]Task {
 	tasks := map[int]Task{}
-	// tasks := []Task{}
+	err := io.ReadFromFile(FILE_NAME, &tasks)
 
-	data, err := os.ReadFile(FILE_NAME)
-
-	if err == nil && len(data) > 0 {
-		_ = json.Unmarshal(data, &tasks)
+	if err != nil {
+		fmt.Println("Error loading tasks:", err)
 	}
+
 	return tasks
 }
 
@@ -93,13 +78,7 @@ func Delete(id ID) (string, error) {
 	}
 
 	delete(tasks, itemKey)
-
-	jsonData, _ := json.MarshalIndent(tasks, "", " ")
-	err := os.WriteFile(FILE_NAME, jsonData, 0664)
-
-	if err != nil {
-		panic(err)
-	}
+	io.WriteToFile(FILE_NAME, &tasks)
 
 	deleteMessage := fmt.Sprintf("Delete Task Successfully %s:", id)
 	return deleteMessage, nil
