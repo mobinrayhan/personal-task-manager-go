@@ -1,6 +1,7 @@
 package task
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -68,4 +69,17 @@ func Delete(id ID) (string, error) {
 
 	deleteMessage := fmt.Sprintf("Delete Task Successfully %s:", id)
 	return deleteMessage, nil
+}
+
+func FetchAllTask(option int) interface{} {
+	tasks := List()
+
+	if option == 1 {
+		return tasks
+	} else if option == 2 {
+		prettyMarshal, _ := json.MarshalIndent(tasks, "", " ")
+		return string(prettyMarshal)
+	} else {
+		return "Invalid Option"
+	}
 }

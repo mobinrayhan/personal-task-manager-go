@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"mobin.dev/cmd"
@@ -17,8 +18,10 @@ func main() {
 
 		switch chosenOption {
 		case 1:
-			allTask := task.List()
-			fmt.Println(allTask)
+			choseOption := cmd.UserInput("\n 1. Go Default \n 2. Pretty Print \n\nChoose One Option Here ")
+			num, _ := strconv.Atoi(choseOption)
+			task := task.FetchAllTask(num)
+			fmt.Println(task)
 		case 2:
 			title, description, dueDate := cmd.AllTaskInputFiled()
 			task.Add(task.Task{
