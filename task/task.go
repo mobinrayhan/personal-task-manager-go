@@ -22,10 +22,12 @@ type Task struct {
 
 const FILE_NAME = "task_list_.json"
 
-func Add(t Task) {
+func Add(t Task, createTaskChan chan string) {
 	tasks := List()
 	tasks = append(tasks, t)
 	io.WriteToFile(FILE_NAME, tasks)
+	time.Sleep(3 * time.Second)
+	createTaskChan <- "Task Added Successfully ✅"
 }
 
 func List() []Task {
@@ -71,15 +73,13 @@ func Delete(id ID) (string, error) {
 	return deleteMessage, nil
 }
 
-func FetchAllTask(option int) interface{} {
+func FetchAllTask(option int, getTaskChan chan interface{}) {
 	tasks := List()
 
 	if option == 1 {
-		return tasks
+		getTaskChan <- tasks
 	} else if option == 2 {
 		prettyMarshal, _ := json.MarshalIndent(tasks, "", " ")
-		return string(prettyMarshal)
-	} else {
-		return "Invalid Option"
+		getTaskChan <- string(prettyMarshal)
 	}
 }
